@@ -4,6 +4,7 @@ import android.content.Context
 import android.location.Address
 import android.location.Geocoder
 import com.ziy.shoppingappliaction.MapsObjects.GeoPoint
+import java.lang.Exception
 
 class MapsHelper(val context: Context)
 {
@@ -28,5 +29,24 @@ class MapsHelper(val context: Context)
         val lng = address.longitude
 
         return GeoPoint(lat, lng)
+    }
+
+    fun getLocationFromAddress(strAdd: String): GeoPoint?
+    {
+        var address: List<Address>
+        var geoPoint: GeoPoint
+
+        address = geocoder.getFromLocationName(strAdd, 5)
+        if(address==null)
+        {
+            return null
+        }
+        else
+        {
+            val location: Address = address.get(0)
+            geoPoint = GeoPoint(location.latitude, location.longitude)
+            return geoPoint
+        }
+        return null
     }
 }

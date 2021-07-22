@@ -9,7 +9,7 @@
     tools:context="com.ziy.shoppingappliaction.Fragments.MapsFragment" >
 
     <Button
-        android:id="@+id/myLocationButton"
+        android:id="@+id/locationButton"
         android:layout_width="115dp"
         android:layout_height="53dp"
         android:layout_marginEnd="16dp"
