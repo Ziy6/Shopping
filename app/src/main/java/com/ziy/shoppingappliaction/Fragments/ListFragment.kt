@@ -37,8 +37,6 @@ class ListFragment : Fragment()
         intialiseListAdapters(view)
         initialiseButtons(view)
 
-
-
         // Inflate the layout for this fragment
         return view
     }
@@ -73,6 +71,13 @@ class ListFragment : Fragment()
                 database.insertList(editListText)
                 arrayList.add(editListText)
                 listAdapter.notifyDataSetChanged()
+
+                //Change to the listItem fragment
+                val itemsFragment = ItemsList(editListText)
+                val fragmentTransaction = parentFragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.navFragmentView, itemsFragment)
+                fragmentTransaction.addToBackStack(null)
+                fragmentTransaction.commit()
             }
         }
 
@@ -93,12 +98,26 @@ class ListFragment : Fragment()
         }
 
         selectButton.setOnClickListener {   view ->
-            //Change to the listItem fragment
-            val itemsFragment = ItemsList()
-            val fragmentTransaction = parentFragmentManager.beginTransaction()
-            fragmentTransaction.replace(R.id.navFragmentView, itemsFragment)
-            fragmentTransaction.addToBackStack(null)
-            fragmentTransaction.commit()
+            if(!arrayList.isEmpty())
+            {   //Only one item
+                if (listView.checkedItemCount == 1)
+                {   //Which item
+                    for(i in arrayList.size-1 downTo 0)
+                    {
+                        if(listView.isItemChecked(i))
+                        {
+                            val checkedItem = arrayList.get(i)
+
+                            //Change to the listItem fragment
+                            val itemsFragment = ItemsList(checkedItem)
+                            val fragmentTransaction = parentFragmentManager.beginTransaction()
+                            fragmentTransaction.replace(R.id.navFragmentView, itemsFragment)
+                            fragmentTransaction.addToBackStack(null)
+                            fragmentTransaction.commit()
+                        }
+                    }
+                }
+            }
         }
     }
 

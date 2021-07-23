@@ -8,7 +8,7 @@ import com.ziy.shoppingappliaction.DatabaseObjects.Driver
 import com.ziy.shoppingappliaction.DatabaseObjects.PaymentOption
 import com.ziy.shoppingappliaction.DatabaseObjects.ShoppingItem
 
-private val DATABASE_NAME = "TestDatabase1"
+private val DATABASE_NAME = "TestDatabase4"
 
 val DRIVER_TABLE = "driverTable"
 val DRIVER_NAME = "driverName"
@@ -18,10 +18,11 @@ val PAYMENT_OPTION_TABLE = "paymentOptionTable"
 val PAYMENT_OPTION_NAME = "cardName"
 val PAYMETN_OPTION_NUMBER = "cardNumber"
 
-val SHOPPING_LIST_TABLE = "shoppingListNameTable"
+val SHOPPING_LIST_TABLE = "shoppingListTable"
 val SHOPPING_LIST_NAME = "shoppingListName"
 
 val SHOPPING_ITEM_TABLE = "shoppingItemTable"
+val SHOPPING_ITEM_ID = "shoppingId"
 val SHOPPING_ITEM_NAME = "shoppingItemName"
 
 val CHECKOUT_LIST_TABLE = "checkoutTable"
@@ -36,6 +37,12 @@ class DatabaseHelper(val context: Context):
         val listsTable = "CREATE TABLE " + SHOPPING_LIST_TABLE + " (" +
                 SHOPPING_LIST_NAME + " VARCHAR(256))"
         db?.execSQL(listsTable)
+
+        //creating Shopping Item table
+        val createShoppingTable = "CREATE TABLE IF NOT EXISTS " + SHOPPING_ITEM_TABLE + " (" +
+                SHOPPING_ITEM_ID + " VARCHAR(256)," +
+                SHOPPING_ITEM_NAME + " VARCHAR(256))"
+        db?.execSQL(createShoppingTable)
 
         //Creating Driver Table
         val driverTable = "CREATE TABLE " + DRIVER_TABLE + " (" +
@@ -101,12 +108,12 @@ class DatabaseHelper(val context: Context):
 
     /********************************** Shopping Items  ****************************************/
     //creating shopping Item table for 1 list
-    fun createListTable(tableName: String)
+    fun createItemTable(tableName: String)
     {
         val db = this.writableDatabase
         //creating Shopping Item table
-        val createShoppingTable = "CREATE TABLE " + tableName + " (" +
-                SHOPPING_ITEM_TABLE + " VARCHAR(256)"
+        val createShoppingTable = "CREATE TABLE IF NOT EXISTS \"" + tableName + "\" (" +
+                SHOPPING_ITEM_NAME + " VARCHAR(256))"
         db?.execSQL(createShoppingTable)
     }
 
@@ -122,31 +129,36 @@ class DatabaseHelper(val context: Context):
     }
 
     //Insert item to shopping list
-    fun insertListItem(shoppingItem: ShoppingItem, tableName: String)
+    fun insertListItem(shopItem: String, shopList: String): Long
     {
         val db = this.writableDatabase
         val contentValues = ContentValues()
-        contentValues.put(SHOPPING_ITEM_NAME, shoppingItem.productName)
+        contentValues.put(SHOPPING_ITEM_ID, shopList)
+        contentValues.put(SHOPPING_ITEM_NAME, shopItem)
 
-        db.insert(tableName, null, contentValues)
+        val success = db.insert(SHOPPING_ITEM_TABLE, null, contentValues)
+        return success
     }
 
-    //remove item from shopping list
-    fun removeListItem(shoppingItem: ShoppingItem, tableName: String)
+    //remove item from shopping list - change to handle IDs
+    fun removeListItem(shopItem: String, shopList: String): Int
     {
         val db = this.writableDatabase
         val contentValues = ContentValues()
+        contentValues.put(SHOPPING_ITEM_NAME, shopItem)
 
-        db.delete(tableName, SHOPPING_ITEM_NAME + " =?",
-            arrayOf(shoppingItem.productName))
+        val success = db.delete(SHOPPING_ITEM_TABLE, SHOPPING_ITEM_NAME + " =?",
+            arrayOf(shopItem))
+
+        return success
     }
 
     //get all list items in list
-    fun getListItem(ListTable: String): MutableList<ShoppingItem>
+    fun getListItem(ListTable: String): MutableList<String>
     {
-        val list: MutableList<ShoppingItem> = ArrayList()
+        val list: MutableList<String> = ArrayList()
         val db = this.readableDatabase
-        val query = "SELECT * FROM $ListTable"
+        val query = "SELECT * FROM " + SHOPPING_ITEM_TABLE
         val result = db.rawQuery(query, null)
 
         if(result.moveToFirst())
@@ -155,8 +167,7 @@ class DatabaseHelper(val context: Context):
             {
                 val shoppingItem = result.getString(result.getColumnIndex(SHOPPING_ITEM_NAME))
 
-                val paymentOption = ShoppingItem(shoppingItem)
-                list.add(paymentOption)
+                list.add(shoppingItem)
             }
             while(result.moveToNext())
         }

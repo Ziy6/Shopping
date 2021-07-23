@@ -1,27 +1,32 @@
 package com.ziy.shoppingappliaction.Fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Button
+import android.widget.EditText
 import android.widget.ListView
+import com.ziy.shoppingappliaction.DatabaseObjects.ShoppingItem
+import com.ziy.shoppingappliaction.Helpers.DatabaseHelper
 import com.ziy.shoppingappliaction.R
 
-class ItemsList : Fragment()
+class ItemsList(item: String) : Fragment()
 {
+    val passedItem = item
     lateinit var listView: ListView
     lateinit var listAdapter: ArrayAdapter<String>
-    val arrayList = ArrayList<String>()
-    var x = 0
+    var arrayList = ArrayList<String>()
+    lateinit var  database: DatabaseHelper
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View?
     {
         val view = inflater.inflate(R.layout.fragment_items_list, container, false)
-
+        database = DatabaseHelper(view.context)
         intialiseListAdapters(view)
         initialiseButtons(view)
 
@@ -32,6 +37,7 @@ class ItemsList : Fragment()
     //setup arraylist and array adapter
     fun intialiseListAdapters(view: View)
     {
+        arrayList = database.getListItem(passedItem) as ArrayList<String>
         listView = view.findViewById(R.id.itemListView)
         listAdapter = ArrayAdapter(this.requireContext(),
             android.R.layout.simple_list_item_multiple_choice, arrayList)
@@ -46,11 +52,15 @@ class ItemsList : Fragment()
         val addItemButton = view.findViewById<Button>(R.id.addItemButton)
         val removeItemButton = view.findViewById<Button>(R.id.removeItemButton)
         val backButton = view.findViewById<Button>(R.id.backButton)
+        val itemEditText = view.findViewById<EditText>(R.id.itemEditText).text.toString()
 
         addItemButton.setOnClickListener {  view ->
-            arrayList.add("counter: " + x.toString())
-            x++
-            listAdapter.notifyDataSetChanged()
+            if(itemEditText != "")
+            {
+                database.insertListItem(itemEditText, passedItem)
+                arrayList.add(itemEditText)
+                listAdapter.notifyDataSetChanged()
+            }
         }
 
         removeItemButton.setOnClickListener {   view ->
@@ -60,6 +70,8 @@ class ItemsList : Fragment()
                 {
                     if(listView.isItemChecked(i))
                     {
+                        val shopItem = arrayList.get(i)
+                        database.removeListItem(shopItem, passedItem)
                         arrayList.removeAt(i)
                         listView.setItemChecked(i, false)
                     }
