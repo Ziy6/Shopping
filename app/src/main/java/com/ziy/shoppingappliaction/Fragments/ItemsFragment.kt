@@ -14,7 +14,7 @@ import com.ziy.shoppingappliaction.DatabaseObjects.ShoppingItem
 import com.ziy.shoppingappliaction.Helpers.DatabaseHelper
 import com.ziy.shoppingappliaction.R
 
-class ItemsList(item: String) : Fragment()
+class ItemsFragment(item: String) : Fragment()
 {
     val passedItem = item
     lateinit var listView: ListView
@@ -37,7 +37,7 @@ class ItemsList(item: String) : Fragment()
     //setup arraylist and array adapter
     fun intialiseListAdapters(view: View)
     {
-        arrayList = database.getListItem(passedItem) as ArrayList<String>
+        arrayList = database.getItem(passedItem) as ArrayList<String>
         listView = view.findViewById(R.id.itemListView)
         listAdapter = ArrayAdapter(this.requireContext(),
             android.R.layout.simple_list_item_multiple_choice, arrayList)
@@ -52,13 +52,14 @@ class ItemsList(item: String) : Fragment()
         val addItemButton = view.findViewById<Button>(R.id.addItemButton)
         val removeItemButton = view.findViewById<Button>(R.id.removeItemButton)
         val backButton = view.findViewById<Button>(R.id.backButton)
-        val itemEditText = view.findViewById<EditText>(R.id.itemEditText).text.toString()
+        val itemEditText = view.findViewById<EditText>(R.id.itemEditText)
 
         addItemButton.setOnClickListener {  view ->
-            if(itemEditText != "")
+            if(itemEditText.text.toString() != "")
             {
-                database.insertListItem(itemEditText, passedItem)
-                arrayList.add(itemEditText)
+                val newItemName = itemEditText.text.toString()
+                database.insertItem(passedItem, newItemName)
+                arrayList.add(newItemName)
                 listAdapter.notifyDataSetChanged()
             }
         }
@@ -71,7 +72,7 @@ class ItemsList(item: String) : Fragment()
                     if(listView.isItemChecked(i))
                     {
                         val shopItem = arrayList.get(i)
-                        database.removeListItem(shopItem, passedItem)
+                        database.removeItem(shopItem, passedItem)
                         arrayList.removeAt(i)
                         listView.setItemChecked(i, false)
                     }

@@ -1,19 +1,11 @@
 package com.ziy.shoppingappliaction.Fragments
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.util.keyIterator
-import androidx.core.util.size
-import androidx.core.view.get
-import androidx.core.view.size
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.commit
-import androidx.navigation.fragment.findNavController
 import com.ziy.shoppingappliaction.Helpers.DatabaseHelper
 import com.ziy.shoppingappliaction.R
 
@@ -73,7 +65,7 @@ class ListFragment : Fragment()
                 listAdapter.notifyDataSetChanged()
 
                 //Change to the listItem fragment
-                val itemsFragment = ItemsList(editListText)
+                val itemsFragment = ItemsFragment(editListText)
                 val fragmentTransaction = parentFragmentManager.beginTransaction()
                 fragmentTransaction.replace(R.id.navFragmentView, itemsFragment)
                 fragmentTransaction.addToBackStack(null)
@@ -109,7 +101,7 @@ class ListFragment : Fragment()
                             val checkedItem = arrayList.get(i)
 
                             //Change to the listItem fragment
-                            val itemsFragment = ItemsList(checkedItem)
+                            val itemsFragment = ItemsFragment(checkedItem)
                             val fragmentTransaction = parentFragmentManager.beginTransaction()
                             fragmentTransaction.replace(R.id.navFragmentView, itemsFragment)
                             fragmentTransaction.addToBackStack(null)
