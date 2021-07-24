@@ -38,7 +38,6 @@ class ListFragment : Fragment()
     {
         //fill initial list with database lists
         arrayList = database.getLists() as ArrayList<String>
-
         listView = view.findViewById(R.id.listView)
         listAdapter = ArrayAdapter(this.requireContext(),
             android.R.layout.simple_list_item_multiple_choice, arrayList)

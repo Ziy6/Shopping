@@ -1,7 +1,7 @@
 package com.ziy.shoppingappliaction.DatabaseObjects
 
-class PaymentOption(cardName: String, cardNumber: Int)
+class PaymentOption(cardName: String, cardNumber: String)
 {
     val cardName: String = cardName
-    val cardNumber: Int = cardNumber
+    val cardNumber: String = cardNumber
 }

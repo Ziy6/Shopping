@@ -26,7 +26,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginLeft="32dp"
         android:layout_marginTop="16dp"
-        android:text="TextView"
+        android:text="Card Name: default name \nCard Number: xxxx-xxxx-xxxx-xxxx"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintStart_toStartOf="parent"
