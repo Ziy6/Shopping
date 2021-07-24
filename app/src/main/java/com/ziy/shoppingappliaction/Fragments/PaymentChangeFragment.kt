@@ -47,9 +47,9 @@ class PaymentChangeFragment : Fragment()
             }
         }
         listAdapter = ArrayAdapter(this.requireContext(),
-            android.R.layout.simple_list_item_multiple_choice, arrayList)
+            android.R.layout.simple_list_item_single_choice, arrayList)
 
-        listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
+        listView.choiceMode = ListView.CHOICE_MODE_SINGLE
         listView.adapter = listAdapter
     }
 
@@ -94,26 +94,19 @@ class PaymentChangeFragment : Fragment()
             if (!arrayList.isEmpty())
             {
                 val strMinipulator = StringMinipulator()
+                val checkedIndex = listView.checkedItemPosition
+                val subStr = strMinipulator.cardFromStr(arrayList.get(checkedIndex))
 
-                //loops through list viewed
-                for(i in arrayList.size-1 downTo 0)
+                if(subStr != null)
                 {
-                    if(listView.isItemChecked(i))
+                    val v = database.removePaymentOption(subStr)
+                    arrayList.removeAt(checkedIndex)   //removes full string from view
+                    listView.setItemChecked(checkedIndex, false)
+
+                    //if is same as default payment option
+                    if(database.getDefaultOption()?.cardNumber?.compareTo(subStr) == 0)
                     {
-                        val subStr = strMinipulator.cardFromStr(arrayList.get(i))
-
-                        if(subStr != null)
-                        {
-                            val v = database.removePaymentOption(subStr)
-                            arrayList.removeAt(i)   //removes full string from view
-                            listView.setItemChecked(i, false)
-
-                            //if is same as default payment option
-                            if(database.getDefaultOption()?.cardNumber?.compareTo(subStr) == 0)
-                            {
-                                database.resetDefaultOption()
-                            }
-                        }
+                        database.resetDefaultOption()
                     }
                 }
                 listAdapter.notifyDataSetChanged()
@@ -123,26 +116,22 @@ class PaymentChangeFragment : Fragment()
             val paymentOption = database.getDefaultOption()
             val storedName = paymentOption?.cardName
             val storedNum = paymentOption?.cardNumber
+            val checkedIndex = listView.checkedItemPosition
 
-            //loops through list viewed
-            for(i in arrayList.size-1 downTo 0)
-            {
-                if(listView.isItemChecked(i))
-                {
-                    val arrString = arrayList.get(i)
+            val arrString = arrayList.get(checkedIndex)
 
-                    //reference point for substrings
-                    val numSubstr = "Card Number: "
-                    val nameIndex = 12
-                    val numberIndex = arrString.indexOf("Card Number: ", 0)
+            //reference point for substrings
+            val numSubstr = "Card Number: "
+            val nameIndex = 12
+            val numberIndex = arrString.indexOf("Card Number: ", 0)
 
-                    val name = arrString.substring(11, numberIndex-2)  //-2 for the \n
-                    val number = arrString.substring(numberIndex+13, arrString.length)
+            val name = arrString.substring(11, numberIndex-2)  //-2 for the \n
+            val number = arrString.substring(numberIndex+13, arrString.length)
 
-                    database.resetDefaultOption()
-                    database.insertDefaultPaymentOption(PaymentOption(name, number))
-                }
-            }
+            database.resetDefaultOption()
+            database.insertDefaultPaymentOption(PaymentOption(name, number))
+
+
         }
     }
 }
